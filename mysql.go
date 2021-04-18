@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -70,9 +71,7 @@ func StartMySQLBox(c *MySQLBoxConfig) (*MySQLBox, error) {
 
 	// mysql log buffer
 	logbuf := bytes.NewBuffer(nil)
-	mylog := &mysqlLogger{
-		buf: logbuf,
-	}
+	mylog := newMySQLLogger(logbuf)
 
 	// Initial schema - write to file so it can be passed to docker
 	var tmpf *os.File
@@ -225,6 +224,7 @@ func StartMySQLBox(c *MySQLBoxConfig) (*MySQLBox, error) {
 		url:           url,
 		stopFunc:      stopFunc,
 		port:          port,
+		logBuf:        logbuf,
 		containerName: c.ContainerName,
 	}
 
@@ -253,10 +253,21 @@ func (b *MySQLBox) CleanTables(table ...string) {
 
 type mysqlLogger struct {
 	buf *bytes.Buffer
+	lg  *log.Logger
+}
+
+func newMySQLLogger(buf *bytes.Buffer) *mysqlLogger {
+	lg := log.New(buf, "mysql: ", 0)
+	lg.SetOutput(buf)
+	ml := &mysqlLogger{
+		buf: buf,
+		lg:  lg,
+	}
+	return ml
 }
 
 func (l *mysqlLogger) Print(args ...interface{}) {
-
+	l.lg.Print(args[0])
 }
 
 var entropy = ulid.Monotonic(rand.Reader, 0)
