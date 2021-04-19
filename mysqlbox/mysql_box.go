@@ -1,4 +1,4 @@
-package testutils
+package mysqlbox
 
 import (
 	"bytes"
@@ -24,17 +24,34 @@ import (
 	"github.com/oklog/ulid/v2"
 )
 
-type MySQLBoxConfig struct {
+type Config struct {
 	ContainerName      string
 	Image              string
 	Database           string
 	RootPassword       string
 	RandomRootPassword bool
 	MySQLPort          int
-	InitialSchemaSQL   io.Reader
+	InitialSchema      *InitialSchema
 }
 
-func (c *MySQLBoxConfig) LoadDefaults() {
+type InitialSchema struct {
+	buf    *bytes.Buffer
+	reader io.Reader
+}
+
+func InitialSchemaFromReader(reader io.Reader) *InitialSchema {
+	return &InitialSchema{
+		reader: reader,
+	}
+}
+
+func InitialSchemaFromBuffer(buf []byte) *InitialSchema {
+	return &InitialSchema{
+		buf: bytes.NewBuffer(buf),
+	}
+}
+
+func (c *Config) LoadDefaults() {
 	if c.Image == "" {
 		c.Image = "mysql:8"
 	}
@@ -59,12 +76,12 @@ type MySQLBox struct {
 	port int
 }
 
-func StartMySQLBox(c *MySQLBoxConfig) (*MySQLBox, error) {
+func Start(c *Config) (*MySQLBox, error) {
 	var envVars []string
 
 	// Load config
 	if c == nil {
-		c = &MySQLBoxConfig{}
+		c = &Config{}
 	}
 
 	c.LoadDefaults()
@@ -75,7 +92,7 @@ func StartMySQLBox(c *MySQLBoxConfig) (*MySQLBox, error) {
 
 	// Initial schema - write to file so it can be passed to docker
 	var tmpf *os.File
-	if c.InitialSchemaSQL != nil {
+	if c.InitialSchema != nil && (c.InitialSchema.reader != nil || c.InitialSchema.buf != nil) {
 		var err error
 		tmpf, err = ioutil.TempFile(os.TempDir(), "schema-*.sql")
 		if err != nil {
@@ -86,7 +103,15 @@ func StartMySQLBox(c *MySQLBoxConfig) (*MySQLBox, error) {
 			os.Remove(tmpf.Name())
 		}()
 
-		_, err = io.Copy(tmpf, c.InitialSchemaSQL)
+		var src io.Reader
+
+		if c.InitialSchema.reader != nil {
+			src = c.InitialSchema.reader
+		} else if c.InitialSchema.buf != nil {
+			src = c.InitialSchema.buf
+		}
+
+		_, err = io.Copy(tmpf, src)
 		if err != nil {
 			return nil, err
 		}
