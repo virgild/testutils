@@ -2,6 +2,8 @@
 
 ## MySQLBox
 
+![MySQLBox logo](https://github.com/virgild/testutils/blob/main/static/logo.png?raw=true)
+
 Creates a ready to use MySQL server running in a Docker container that can be
 used for testing.
 
