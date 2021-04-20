@@ -1,6 +1,6 @@
 # testutils
 
-testutils contains packages that helps in testing Go programs.
+testutils contains packages that help in testing Go programs.
 
 ## MySQLBox
 
@@ -9,7 +9,7 @@ testutils contains packages that helps in testing Go programs.
 MySQLBox creates a ready to use MySQL server running in a Docker container that can be
 used in Go tests. The `Start()` function returns a `MySQLBox` that has a container running MySQL server. 
 It has a `Stop()` function that stops the container when called. The `DB()` function returns a connected 
-`sql.DB` object that can be used to send queries to MySQL. 
+`sql.DB` object that can be used to send queries to MySQL.
 
 ```go
 package mytests
@@ -121,3 +121,7 @@ if err != nil {
 #### Cleaning tables
 
 All tables can be truncated by calling `CleanAllTables()`. This runs `TRUNCATE` on all tables in the database, except for those specified in the `Config.DoNotCleanTables` array. `CleanTables()` can also be used to truncate just the passed table names. Being in the `CleanTables()` will always truncate a table even if it is included in the `DoNotCleanTables` list.
+
+### Using MySQLBox outside tests
+
+It is not recommended to use MySQLBox as a normal MySQL database. This component is designed to be ephemeral, and no precautions are implemented to protect the database data.
