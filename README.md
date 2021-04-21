@@ -1,15 +1,23 @@
 # testutils
 
-testutils contains packages that help in testing Go programs.
+testutils contains packages that help in testing Go programs. The first package is called **mysqlbox**, and it allows your test code to start a MySQL server in a Docker container. Your tests can use this if you need to run them against a real MySQL server.
 
-## MySQLBox
+## mysqlbox
 
 ![MySQLBox logo](https://github.com/virgild/testutils/blob/main/static/logo.png?raw=true)
 
-MySQLBox creates a ready to use MySQL server running in a Docker container that can be
+**mysqlbox** creates a ready to use MySQL server in a Docker container that can be
 used in Go tests. The `Start()` function returns a `MySQLBox` that has a container running MySQL server. 
-It has a `Stop()` function that stops the container when called. The `DB()` function returns a connected 
-`sql.DB` object that can be used to send queries to MySQL.
+It has a `Stop()` function that stops the container. The `DB()` function returns a connected 
+`sql.DB` that can be used to send queries to MySQL.
+
+### Install mysqlbox
+
+```sh
+go get github.com/virgild/testutils/mysqlbox
+```
+
+### Basic usage
 
 ```go
 package mytests
@@ -56,7 +64,7 @@ func TestMyCode(t *testing.T) {
 
 MySQL server can be started with an initial SQL script that is run after the service starts. It can be provided as an `io.Reader` or a `[]byte` buffer.
 
-##### Using `mysqlbox.DataFromReader()`
+##### Specifying the initial script from a file/reader
 
 ```go
 schemaFile, err := os.Open("testdata/schema.sql")
@@ -80,7 +88,7 @@ t.Cleanup(func() {
 })
 ```
 
-##### Using `mysqlbox.DataFromBuffer()`
+##### Specifying the initial script from a byte buffer
 
 ```go
 sql := []byte(`
@@ -130,8 +138,8 @@ It is not recommended to use MySQLBox as a normal MySQL database. This component
 
 * I forgot to call `Stop()` and now I have a several containers that are still running.
 
-    The following command can be run to stop the containers started by MySQLBox.
+    The following command can be run to stop the containers started by `MySQLBox`.
 
-    ```shell
+    ```sh
     docker ps -a -f "label=com.github.virgild.testutils.mysqlbox" --format '{{.ID}}' | xargs docker stop
     ```
