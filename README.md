@@ -105,8 +105,8 @@ sql := []byte(`
 	DEFAULT CHARSET = utf8mb4;
 `)
 
-b, err := Start(&Config{
-	InitialSQL: DataFromBuffer(sql),
+b, err := mysqlbox.Start(&Config{
+	InitialSQL: mysqlbox.DataFromBuffer(sql),
 })
 if err != nil {
 	t.Fatal(err)
@@ -128,7 +128,7 @@ if err != nil {
 
 #### Cleaning tables
 
-All tables can be truncated by calling `CleanAllTables()`. This runs `TRUNCATE` on all tables in the database, except for those specified in the `Config.DoNotCleanTables` array. `CleanTables()` can also be used to truncate just the passed table names. Being in the `CleanTables()` will always truncate a table even if it is included in the `DoNotCleanTables` list.
+All tables can be truncated by calling `CleanAllTables()`. This runs `TRUNCATE` on all tables in the database, except for those specified in the `Config.DoNotCleanTables` array. Another function called `CleanTables()` can  be used to truncate just specific tables you want to clean. Any table passed to `CleanTables()` will always truncate it even if it is included in the `DoNotCleanTables` list.
 
 ### Using MySQLBox outside tests
 
