@@ -125,3 +125,13 @@ All tables can be truncated by calling `CleanAllTables()`. This runs `TRUNCATE` 
 ### Using MySQLBox outside tests
 
 It is not recommended to use MySQLBox as a normal MySQL database. This component is designed to be ephemeral, and no precautions are implemented to protect the database data.
+
+### Troubleshooting and other notes
+
+* I forgot to call `Stop()` and now I have a several containers that are still running.
+
+    The following command can be run to stop the containers started by MySQLBox.
+
+    ```shell
+    docker ps -a -f "label=com.github.virgild.testutils.mysqlbox" --format '{{.ID}}' | xargs docker stop
+    ```
