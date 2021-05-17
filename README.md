@@ -1,3 +1,5 @@
+# This package is now deprecated and replaced by a [mysqlbox package](https://github.com/virgild/mysqlbox) on its own.
+---
 # testutils
 
 testutils contains packages that help in testing Go programs. The first package is called **mysqlbox**, and it allows your test code to start a MySQL server in a Docker container. Your tests can use this if you need to run them against a real MySQL server.
