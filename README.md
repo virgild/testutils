@@ -24,6 +24,7 @@ package mytests
 
 import (
 	"testing"
+	"time"
 
 	"github.com/virgild/testutils/mysqlbox"
 )
@@ -43,8 +44,8 @@ func TestMyCode(t *testing.T) {
 	    }
 	})
 	
-	// Use the sql.DB object to query the database.
-	box.DB().QueryRow("SELECT NOW()")
+	// Use the box's sql.DB object to query the database.
+	row := box.MustDB().QueryRow("SELECT NOW()")
 	
 	var now time.Time
 	err = row.Scan(&row)
