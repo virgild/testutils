@@ -37,7 +37,7 @@ func TestMyCode(t *testing.T) {
 
 	// Register the stop func to stop the container after the test.
 	t.Cleanup(func() {
-	    err := b.Stop()
+	    err := box.Stop()
 	    if err != nil {
 	        t.Fatal(err)
 	    }
